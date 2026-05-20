@@ -1,0 +1,56 @@
+[
+    {
+        "flight_id": "F101",
+        "airline": "IndiGo",
+        "source": "Delhi",
+        "destination": "Goa",
+        "departure": "14:00",
+        "duration_hrs": 2.5,
+        "price_inr": 4800
+    },
+    {
+        "flight_id": "F102",
+        "airline": "Air India",
+        "source": "Delhi",
+        "destination": "Goa",
+        "departure": "10:30",
+        "duration_hrs": 2.5,
+        "price_inr": 5500
+    },
+    {
+        "flight_id": "F103",
+        "airline": "SpiceJet",
+        "source": "Mumbai",
+        "destination": "Goa",
+        "departure": "16:00",
+        "duration_hrs": 1.2,
+        "price_inr": 2500
+    },
+    {
+        "flight_id": "F104",
+        "airline": "Vistara",
+        "source": "Bangalore",
+        "destination": "Goa",
+        "departure": "09:00",
+        "duration_hrs": 1.5,
+        "price_inr": 3500
+    },
+    {
+        "flight_id": "F105",
+        "airline": "IndiGo",
+        "source": "Delhi",
+        "destination": "Manali",
+        "departure": "18:00",
+        "duration_hrs": 14,
+        "price_inr": 1200
+    },
+    {
+        "flight_id": "F106",
+        "airline": "Air India",
+        "source": "Mumbai",
+        "destination": "Delhi",
+        "departure": "08:00",
+        "duration_hrs": 2.0,
+        "price_inr": 4000
+    }
+]

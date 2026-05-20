@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.db
+travel.db
+.env
+read_docx_output.txt
+temp_docx_extract/

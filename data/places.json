@@ -1,0 +1,42 @@
+[
+    {
+        "place_id": "P101",
+        "name": "Baga Beach",
+        "city": "Goa",
+        "type": "Beach",
+        "rating": 4.6,
+        "description": "Popular beach known for water sports and nightlife."
+    },
+    {
+        "place_id": "P102",
+        "name": "Basilica of Bom Jesus",
+        "city": "Goa",
+        "type": "Historical",
+        "rating": 4.8,
+        "description": "UNESCO World Heritage site."
+    },
+    {
+        "place_id": "P103",
+        "name": "Dudhsagar Waterfalls",
+        "city": "Goa",
+        "type": "Nature",
+        "rating": 4.7,
+        "description": "Four-tiered waterfall on the Mandovi River."
+    },
+    {
+        "place_id": "P104",
+        "name": "Rohtang Pass",
+        "city": "Manali",
+        "type": "Nature",
+        "rating": 4.9,
+        "description": "High mountain pass known for snow activities."
+    },
+    {
+        "place_id": "P105",
+        "name": "Red Fort",
+        "city": "Delhi",
+        "type": "Historical",
+        "rating": 4.7,
+        "description": "Historic fort in the city of Delhi."
+    }
+]

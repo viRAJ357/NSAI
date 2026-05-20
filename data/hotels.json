@@ -1,0 +1,58 @@
+[
+    {
+        "hotel_id": "H101",
+        "name": "Sea View Resort",
+        "city": "Goa",
+        "rating": 4.5,
+        "price_per_night_inr": 3200,
+        "amenities": [
+            "Pool",
+            "Free WiFi",
+            "Breakfast"
+        ]
+    },
+    {
+        "hotel_id": "H102",
+        "name": "Taj Exotica",
+        "city": "Goa",
+        "rating": 5.0,
+        "price_per_night_inr": 12000,
+        "amenities": [
+            "Private Beach",
+            "Spa",
+            "Luxury Dining"
+        ]
+    },
+    {
+        "hotel_id": "H103",
+        "name": "Budget Inn",
+        "city": "Goa",
+        "rating": 3.0,
+        "price_per_night_inr": 1200,
+        "amenities": [
+            "Free WiFi"
+        ]
+    },
+    {
+        "hotel_id": "H104",
+        "name": "Snow Peak Hotel",
+        "city": "Manali",
+        "rating": 4.2,
+        "price_per_night_inr": 2800,
+        "amenities": [
+            "Mountain View",
+            "Heater"
+        ]
+    },
+    {
+        "hotel_id": "H105",
+        "name": "Delhi City Center Hotel",
+        "city": "Delhi",
+        "rating": 4.0,
+        "price_per_night_inr": 4500,
+        "amenities": [
+            "Gym",
+            "Breakfast"
+        ]
+    }
+]
