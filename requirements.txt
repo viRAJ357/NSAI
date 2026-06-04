@@ -1,0 +1,10 @@
+flask==3.0.3
+flask-cors==4.0.0
+langchain==0.1.16
+langchain-community==0.0.34
+langchain-google-genai==1.0.3
+langgraph==0.0.39
+duckduckgo-search==5.3.0
+pandas==2.2.2
+PyPDF2==3.0.1
+langchain-experimental==0.0.57

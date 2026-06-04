@@ -1,25 +1,14 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from agent import get_agent
-import logging
-import traceback
-import os
+from api.agent import get_agent
 
-# Serve frontend files from the dark-gpt folder
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dark-gpt')
-
-app = Flask(__name__, static_folder=FRONTEND_DIR)
+app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+import logging
+import traceback
+
 logging.basicConfig(level=logging.INFO)
-
-@app.route('/')
-def serve_index():
-    return send_from_directory(FRONTEND_DIR, 'index.html')
-
-@app.route('/<path:filename>')
-def serve_static(filename):
-    return send_from_directory(FRONTEND_DIR, filename)
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
