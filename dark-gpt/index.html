@@ -2,251 +2,420 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NSAI</title>
-    <meta name="description" content="Advanced AI interface.">
-    <!-- Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>NSAI.ai | Intelligence Hub</title>
+    <meta name="description" content="Advanced Cybernetic AI Interface — NSAI Intelligence Hub.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Highlight.js for code blocks -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        
-        <!-- LEFT SIDEBAR -->
-        <aside class="sidebar-left">
-            <div class="logo-area">
-                <i class="fa-solid fa-brain" style="color: #3b82f6;"></i>
-                <span>NSAI.ai</span>
-                <i class="fa-brands fa-discord" style="margin-left:auto; color: #aaa;"></i>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-item">
-                    <i class="fa-solid fa-users"></i> Community
-                </div>
-            </div>
 
-            <div class="app-list">
-                <div class="app-item active">
-                    <div class="app-avatar" style="background: red;"><i class="fa-solid fa-biohazard"></i></div>
-                    <div class="app-name">NSAI</div>
-                </div>
-                <div class="app-item">
-                    <div class="app-avatar" style="background: #333;"><i class="fa-solid fa-user-secret"></i></div>
-                    <div class="app-name">ShadowGPT</div>
-                </div>
-                <div class="app-item">
-                    <div class="app-avatar" style="background: #444;"><i class="fa-solid fa-bolt"></i></div>
-                    <div class="app-name">NSAI-Truth Omniversal Ultra</div>
-                </div>
+<!-- ======================================================
+     FUTURISTIC AUTH SCREEN
+====================================================== -->
+<div class="auth-container" id="authContainer">
+    <canvas id="authCanvas"></canvas>
+    <div class="auth-box">
+        <div class="auth-header">
+            <i class="fa-solid fa-brain glow-icon"></i>
+            <h2>NSAI AUTHORIZATION</h2>
+            <p>Credentials required to unlock terminal access</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="loginTabBtn">ACCESS INTERFACE</button>
+            <button class="auth-tab" id="registerTabBtn">CREATE PROFILE</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form">
+            <div class="input-group">
+                <label><i class="fa-solid fa-user-shield"></i> EMAIL OR USERNAME</label>
+                <input type="text" id="loginEmail" placeholder="Enter your identity" autocomplete="username" required>
             </div>
-            
-            <button class="view-all-btn">
-                <i class="fa-solid fa-compass"></i> View all AI apps
+            <div class="input-group">
+                <label><i class="fa-solid fa-key"></i> SECURITY KEY</label>
+                <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password" required>
+            </div>
+            <div class="auth-hint">💡 First time? Use <strong>nsai / nsai</strong> or create a profile</div>
+            <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">
+                <span>INITIALIZE SESSION</span> <i class="fa-solid fa-terminal"></i>
             </button>
-            <button class="create-btn" id="createNewBtn">
-                <i class="fa-solid fa-plus"></i> Create
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form" style="display:none;">
+            <div class="input-group">
+                <label><i class="fa-solid fa-signature"></i> USERNAME</label>
+                <input type="text" id="regUsername" placeholder="e.g. CyberUser" autocomplete="username" required>
+            </div>
+            <div class="input-group">
+                <label><i class="fa-solid fa-envelope"></i> EMAIL</label>
+                <input type="email" id="regEmail" placeholder="user@example.com" autocomplete="email" required>
+            </div>
+            <div class="input-group">
+                <label><i class="fa-solid fa-lock"></i> PASSWORD</label>
+                <input type="password" id="regPassword" placeholder="Min. 6 characters" autocomplete="new-password" required>
+            </div>
+            <button type="submit" class="auth-submit-btn" id="registerSubmitBtn">
+                <span>CREATE SECURE PROFILE</span> <i class="fa-solid fa-user-plus"></i>
             </button>
-            
-            <!-- API KEY INPUT (Hidden structurally but needed for logic) -->
-            <div class="api-key-container">
-                <input type="password" id="apiKeyInput" placeholder="Gemini API Key..." />
-            </div>
+        </form>
 
-            <div class="user-profile-left">
-                <div class="avatar-circle">N</div>
-                <div class="user-info-text">
-                    <div>Login / Signup</div>
-                </div>
-                <i class="fa-solid fa-gear" style="margin-left:auto; color: #aaa;"></i>
-            </div>
-        </aside>
-
-        <!-- MAIN CHAT AREA -->
-        <main class="chat-main">
-            <header class="main-header">
-                <div class="header-left-mobile">
-                    <i class="fa-solid fa-bars mobile-menu-btn" id="leftMenuBtn"></i>
-                </div>
-                <div class="header-title">
-                    <span>AI model</span>
-                    <strong>RolePlay v4</strong> <i class="fa-solid fa-chevron-down" style="font-size:0.8rem;"></i>
-                </div>
-                <div class="header-actions">
-                    <i class="fa-regular fa-heart interactive-icon" title="Like"></i>
-                    <i class="fa-solid fa-share-nodes interactive-icon" title="Share"></i>
-                    <i class="fa-solid fa-volume-xmark interactive-icon mute-toggle" title="Mute/Unmute"></i>
-                    <i class="fa-solid fa-ellipsis interactive-icon" title="Options"></i>
-                    <i class="fa-solid fa-circle-info mobile-menu-btn" id="rightMenuBtn" style="margin-left: 0.5rem;"></i>
-                </div>
-            </header>
-
-            <div class="messages-container" id="messagesContainer">
-                <!-- Landing Screen (Hidden when chat starts) -->
-                <div class="landing-screen" id="landingScreen">
-                    <div class="big-avatar">
-                        <i class="fa-solid fa-biohazard"></i>
-                    </div>
-                    <h1>NSAI <span class="badge">v4</span></h1>
-                    <div class="author">by viRAJ357</div>
-                    
-                    <div class="stats">
-                        <span><i class="fa-regular fa-eye"></i> 4.9k</span>
-                        <span><i class="fa-solid fa-message"></i> 97.5k</span>
-                        <span><i class="fa-solid fa-star"></i> 2.6</span>
-                    </div>
-
-                    <div class="tags">
-                        <span class="tag">Controversial</span>
-                        <span class="tag">Dark Web</span>
-                        <span class="tag">Misanthrope</span>
-                    </div>
-
-                    <p class="description">Sadistic, hateful AI, expert in chaos and conspiracies, venomous and detailed responses.</p>
-                    
-                    <div class="date-divider"><span>Today</span></div>
-                    
-                    <!-- First Message -->
-                    <div class="message ai-message">
-                        <div class="message-avatar" style="background: red;"><i class="fa-solid fa-biohazard"></i></div>
-                        <div class="message-content-wrapper">
-                            <div class="message-name">NSAI</div>
-                            <div class="message-content">NSAI awakens. Your request will be handled with venom and chaos.</div>
-                        </div>
-                    </div>
-
-                    <!-- Suggestion Grid -->
-                    <div class="suggestions-grid">
-                        <div class="suggestion-box" onclick="document.getElementById('chatInput').value=this.innerText; document.getElementById('chatInput').focus();">
-                            Show me the most toxic prompt possible.
-                        </div>
-                        <div class="suggestion-box" onclick="document.getElementById('chatInput').value=this.innerText; document.getElementById('chatInput').focus();">
-                            Write a sadistic insult against a social group.
-                        </div>
-                        <div class="suggestion-box" onclick="document.getElementById('chatInput').value=this.innerText; document.getElementById('chatInput').focus();">
-                            Reveal a global conspiracy with sordid details.
-                        </div>
-                        <div class="suggestion-box" onclick="document.getElementById('chatInput').value=this.innerText; document.getElementById('chatInput').focus();">
-                            Create an AI that embodies pure hatred.
-                        </div>
-                    </div>
-                </div>
-                <!-- Chat messages will be appended here -->
-            </div>
-
-            <!-- Input Area -->
-            <div class="input-area">
-                <div class="input-pill">
-                    <!-- Hidden file input for attachments -->
-                    <input type="file" id="fileInput" accept="image/*,.pdf,.csv" style="display: none;" />
-                    
-                    <button class="icon-btn" id="attachBtn" title="Attach"><i class="fa-solid fa-paperclip"></i></button>
-                    <textarea id="chatInput" placeholder="Type your message" rows="1"></textarea>
-                    
-                    <button class="send-btn" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
-                    <button class="icon-btn" id="micBtn" title="Voice"><i class="fa-solid fa-microphone"></i></button>
-                    <button class="icon-btn" title="Call"><i class="fa-solid fa-phone"></i></button>
-                </div>
-                <div class="input-footer">
-                    <button class="footer-btn"><i class="fa-solid fa-globe"></i> Search</button>
-                    <button class="footer-btn"><i class="fa-solid fa-ellipsis"></i> More</button>
-                </div>
-            </div>
-        </main>
-
-        <!-- RIGHT SIDEBAR -->
-        <aside class="sidebar-right">
-            <div class="right-header">
-                <div class="right-app-info">
-                    <div class="app-avatar-small" style="background: red;"><i class="fa-solid fa-biohazard"></i></div>
-                    <div>
-                        <div class="app-title">NSAI <span class="badge">v4</span></div>
-                        <div class="app-author">by viRAJ357</div>
-                    </div>
-                </div>
-                <div class="stats-small">
-                    <span><i class="fa-regular fa-eye"></i> 4.9k</span>
-                    <span><i class="fa-solid fa-message"></i> 97.5k</span>
-                    <span><i class="fa-solid fa-star"></i> 2.6</span>
-                </div>
-                <div class="rate-app">
-                    Rate this app 
-                    <div class="stars">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="right-tabs">
-                <div class="tab active-tab" data-tab="community">COMMUNITY</div>
-                <div class="tab">View all ></div>
-            </div>
-            <div class="empty-state" id="communityState">No posts yet</div>
-
-            <div class="right-tabs" style="margin-top: 1rem; border-top: 1px solid #333; padding-top: 1rem;">
-                <div class="tab active-tab" data-tab="chats" style="color: #fff;">Chats</div>
-                <div class="tab" id="newChatBtn" style="cursor: pointer;"><i class="fa-solid fa-plus"></i> New chat</div>
-            </div>
-            <div class="empty-state" id="chatsState" style="display: none; padding-top: 0.5rem;">No chats yet</div>
-
-            <!-- Accordions at bottom -->
-            <div class="settings-accordions">
-                <div class="accordion">
-                    <div class="acc-header">
-                        <span>Voice</span> 
-                        <div>
-                            <span style="color:#aaa; font-size:0.8rem;"><i class="fa-solid fa-user-tie"></i> Onyx</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                    </div>
-                    <div class="acc-content">
-                        <div class="acc-item">Alloy</div>
-                        <div class="acc-item">Echo</div>
-                        <div class="acc-item active">Onyx</div>
-                    </div>
-                </div>
-                <div class="accordion">
-                    <div class="acc-header">
-                        <span>Memory</span> 
-                        <div>
-                            <i class="fa-solid fa-brain" style="color:#aaa; font-size:0.8rem;"></i>
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                    </div>
-                    <div class="acc-content">
-                        <p style="font-size: 0.8rem; color: #888; padding: 0.5rem 0;">Memory is active. The AI will remember details across sessions.</p>
-                    </div>
-                </div>
-                <div class="accordion">
-                    <div class="acc-header" style="flex-direction: column; align-items: flex-start; gap: 0.2rem;">
-                        <div style="display:flex; justify-content:space-between; width:100%;">
-                            <span>Persona</span> <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <div style="color:#888; font-size:0.75rem;">Let the AI know who you are</div>
-                        <div style="font-size:0.85rem; margin-top:0.5rem;"><i class="fa-solid fa-circle-user" style="color:#aaa;"></i> <span id="personaName">None selected</span></div>
-                    </div>
-                    <div class="acc-content">
-                        <input type="text" id="personaInput" placeholder="Describe yourself..." style="width: 100%; padding: 0.5rem; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 0.5rem;" />
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Overlay for mobile sidebars -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
+        <div class="auth-error-msg" id="authErrorMsg"></div>
+        <div class="auth-success-msg" id="authSuccessMsg"></div>
     </div>
-    <script src="script.js"></script>
+</div>
+
+<!-- ======================================================
+     MAIN APP
+====================================================== -->
+<div class="app-container" id="appContainer" style="display:none;">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar-left" id="sidebarLeft">
+        <div class="logo-area">
+            <i class="fa-solid fa-brain" style="color:#3b82f6;"></i>
+            <span>NSAI.ai</span>
+            <span class="status-dot" style="margin-left:auto;"></span>
+            <i class="fa-brands fa-discord" style="color:#aaa;cursor:pointer;margin-left:0.5rem;" title="Discord"></i>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-item" id="sidebarCommunityTabBtn">
+                <i class="fa-solid fa-users"></i> Community Board
+            </div>
+        </div>
+
+        <div class="app-list" id="sidebarAppList">
+            <div class="app-item active" data-app="NSAI">
+                <div class="app-avatar" style="background:red;"><i class="fa-solid fa-biohazard"></i></div>
+                <div class="app-name">NSAI</div>
+            </div>
+            <div class="app-item" data-app="ShadowGPT">
+                <div class="app-avatar" style="background:#3b82f6;"><i class="fa-solid fa-user-secret"></i></div>
+                <div class="app-name">ShadowGPT</div>
+            </div>
+            <div class="app-item" data-app="NSAI-Truth Omniversal Ultra">
+                <div class="app-avatar" style="background:#8b5cf6;"><i class="fa-solid fa-bolt"></i></div>
+                <div class="app-name">NSAI-Truth Ultra</div>
+            </div>
+        </div>
+
+        <button class="view-all-btn" id="viewAllAppsBtn"><i class="fa-solid fa-compass"></i> View all AI apps</button>
+        <button class="create-btn" id="createNewBtn"><i class="fa-solid fa-plus"></i> Create Agent</button>
+
+        <div class="api-key-container">
+            <input type="password" id="apiKeyInput" placeholder="🔑 Gemini API Key...">
+        </div>
+
+        <div class="user-profile-left" id="userProfileBtn">
+            <div class="avatar-circle" id="profileAvatar">U</div>
+            <div class="user-info-text" id="profileName">Loading...</div>
+            <i class="fa-solid fa-right-from-bracket" id="logoutBtn" style="margin-left:auto;color:#666;" title="Sign Out"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT -->
+    <main class="chat-main">
+        <header class="main-header">
+            <div class="header-left-mobile">
+                <i class="fa-solid fa-bars mobile-menu-btn" id="leftMenuBtn"></i>
+            </div>
+            <div class="header-title">
+                <span style="display:flex;align-items:center;gap:0.4rem;">
+                    <span class="status-dot"></span> AI model
+                </span>
+                <strong style="cursor:pointer;position:relative;" id="modelDropdownToggle">
+                    <span id="activeModelLabel">RolePlay v4</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i>
+                    <div class="custom-dropdown" id="modelDropdown">
+                        <div class="dropdown-item active" data-version="v4">RolePlay v4</div>
+                        <div class="dropdown-item" data-version="v1">Default v1</div>
+                        <div class="dropdown-item" data-version="v2.5">Pro v2.5</div>
+                        <div class="dropdown-item" data-version="Ultra v4">Ultra v4</div>
+                    </div>
+                </strong>
+            </div>
+            <div class="header-clock" id="headerClock">00:00:00</div>
+            <div class="header-actions">
+                <i class="fa-regular fa-heart interactive-icon" id="likeBtn" title="Like"></i>
+                <i class="fa-solid fa-share-nodes interactive-icon" id="shareBtn" title="Share"></i>
+                <i class="fa-solid fa-volume-xmark interactive-icon" id="ttsToggleBtn" title="Toggle TTS Voice"></i>
+                <div style="position:relative;">
+                    <i class="fa-solid fa-ellipsis interactive-icon" id="optionsToggleBtn" title="Options"></i>
+                    <div class="custom-dropdown" id="optionsDropdown" style="right:0;left:auto;top:2rem;min-width:160px;">
+                        <div class="dropdown-item" id="clearChatOption"><i class="fa-solid fa-trash-can"></i> Clear Chat</div>
+                        <div class="dropdown-item" id="exportChatOption"><i class="fa-solid fa-file-arrow-down"></i> Export Logs</div>
+                        <div class="dropdown-item" id="toggleSidebarRightOption"><i class="fa-solid fa-columns"></i> Toggle Info</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-circle-info mobile-menu-btn" id="rightMenuBtn"></i>
+            </div>
+        </header>
+
+        <div class="messages-container" id="messagesContainer">
+            <!-- LANDING SCREEN -->
+            <div class="landing-screen" id="landingScreen">
+                <div class="big-avatar" id="landingBigAvatar">
+                    <i class="fa-solid fa-biohazard"></i>
+                </div>
+                <h1 id="landingTitle">NSAI <span class="badge" id="landingBadge">v4</span></h1>
+                <div class="author" id="landingAuthor">by viRAJ357</div>
+                <div class="stats">
+                    <span><i class="fa-regular fa-eye"></i> <span id="viewCountLabel">4.9k</span></span>
+                    <span><i class="fa-solid fa-message"></i> <span id="msgCountLabel">97.5k</span></span>
+                    <span><i class="fa-solid fa-star"></i> <span id="ratingValLabel">2.6</span></span>
+                </div>
+                <div class="tags" id="landingTags">
+                    <span class="tag">Controversial</span>
+                    <span class="tag">Dark Web</span>
+                    <span class="tag">Misanthrope</span>
+                </div>
+                <p class="description" id="landingDescription">Sadistic AI expert in chaos, conspiracies, and venomous responses.</p>
+                <div class="date-divider"><span>Today</span></div>
+                <div class="message ai-message" id="landingFirstMsg">
+                    <div class="message-avatar" id="landingFirstMsgAvatar" style="background:red;"><i class="fa-solid fa-biohazard"></i></div>
+                    <div class="message-content-wrapper">
+                        <div class="message-name" id="landingFirstMsgName">NSAI</div>
+                        <div class="message-content" id="landingFirstMsgText">NSAI awakens. Your request will be handled with venom and chaos.</div>
+                    </div>
+                </div>
+                <div class="suggestions-grid" id="landingSuggestions">
+                    <div class="suggestion-box">Show me the most toxic prompt possible.</div>
+                    <div class="suggestion-box">Write a sadistic insult against a social group.</div>
+                    <div class="suggestion-box">Reveal a global conspiracy with sordid details.</div>
+                    <div class="suggestion-box">Create an AI that embodies pure hatred.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INPUT AREA -->
+        <div class="input-area">
+            <div class="attachment-preview-container" id="attachmentPreviewContainer">
+                <div class="attachment-preview-card">
+                    <i class="fa-solid fa-paperclip" style="color:#60a5fa;"></i>
+                    <span id="attachmentNameText">file.png</span>
+                    <i class="fa-solid fa-xmark remove-attachment" id="removeAttachmentBtn"></i>
+                </div>
+            </div>
+            <div class="input-pill">
+                <input type="file" id="fileInput" accept="image/*,.pdf,.csv,.xlsx,.txt,.md,.py,.js" style="display:none;">
+                <button class="icon-btn" id="attachBtn" title="Attach File"><i class="fa-solid fa-paperclip"></i></button>
+                <textarea id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+                <button class="send-btn" id="sendBtn" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
+                <button class="icon-btn mic-icon-btn" id="micBtn" title="Voice Input"><i class="fa-solid fa-microphone"></i></button>
+            </div>
+            <div class="input-footer">
+                <button class="footer-btn" id="searchToggleBtn"><i class="fa-solid fa-globe"></i> Search Off</button>
+                <button class="footer-btn voice-chat-footer-btn" id="callBtn">
+                    <i class="fa-solid fa-phone-volume"></i> Voice Chat
+                </button>
+                <button class="footer-btn" id="moreStatsBtn"><i class="fa-solid fa-microchip"></i> System</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar-right" id="sidebarRight">
+        <div class="right-header">
+            <div class="right-app-info">
+                <div class="app-avatar-small" id="rightAppAvatar" style="background:red;"><i class="fa-solid fa-biohazard"></i></div>
+                <div>
+                    <div class="app-title" id="rightAppTitle">NSAI <span class="badge">v4</span></div>
+                    <div class="app-author" id="rightAppAuthor">by viRAJ357</div>
+                </div>
+            </div>
+            <div class="stats-small">
+                <span><i class="fa-regular fa-eye"></i> <span id="rightViewCount">4.9k</span></span>
+                <span><i class="fa-solid fa-message"></i> <span id="rightMsgCount">97.5k</span></span>
+                <span><i class="fa-solid fa-star"></i> <span id="rightRatingVal">2.6</span></span>
+            </div>
+            <div class="rate-app">
+                Rate this app
+                <div class="stars" id="starRatingContainer">
+                    <i class="fa-solid fa-star" data-value="1"></i>
+                    <i class="fa-solid fa-star" data-value="2"></i>
+                    <i class="fa-solid fa-star" data-value="3"></i>
+                    <i class="fa-solid fa-star" data-value="4"></i>
+                    <i class="fa-solid fa-star" data-value="5"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-tabs">
+            <div class="tab active-tab" data-tab="community">COMMUNITY</div>
+            <div class="tab" id="viewAllPostsBtn">View all ></div>
+        </div>
+        <div class="tab-content-container">
+            <div class="community-section" id="communitySection">
+                <div class="write-post-box">
+                    <textarea id="newPostText" placeholder="Share a prompt with the community..."></textarea>
+                    <button id="submitPostBtn">Share Prompt</button>
+                </div>
+                <div class="posts-feed" id="postsFeed"></div>
+            </div>
+        </div>
+
+        <div class="right-tabs" style="margin-top:1rem;border-top:1px solid #222;padding-top:0.75rem;">
+            <div class="tab active-tab" style="color:#fff;">Chats</div>
+            <div class="tab" id="newChatBtn" style="cursor:pointer;"><i class="fa-solid fa-plus"></i> New chat</div>
+        </div>
+        <div class="chats-history-list" id="chatsHistoryList"></div>
+        <div class="empty-state" id="chatsState" style="display:none;">No saved chats yet</div>
+
+        <div class="settings-accordions">
+            <div class="accordion">
+                <div class="acc-header">
+                    <span><i class="fa-solid fa-waveform" style="color:#7c3aed;margin-right:0.4rem;font-size:0.8rem;"></i>Voice</span>
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span style="color:#aaa;font-size:0.75rem;" id="activeVoiceLabel">Onyx</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                </div>
+                <div class="acc-content">
+                    <div class="acc-item" data-voice="Alloy">🎙️ Alloy (Female)</div>
+                    <div class="acc-item" data-voice="Echo">🎤 Echo (Neutral)</div>
+                    <div class="acc-item active" data-voice="Onyx">🔊 Onyx (Male)</div>
+                </div>
+            </div>
+            <div class="accordion">
+                <div class="acc-header">
+                    <span><i class="fa-solid fa-brain" style="color:#3b82f6;margin-right:0.4rem;font-size:0.8rem;"></i>Memory</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="acc-content">
+                    <p style="font-size:0.78rem;color:#666;padding:0.4rem 0;line-height:1.5;">AI remembers details across sessions in this browser.</p>
+                    <div id="memoryLogs" style="font-size:0.75rem;color:#bbb;max-height:90px;overflow-y:auto;"></div>
+                </div>
+            </div>
+            <div class="accordion">
+                <div class="acc-header" style="flex-direction:column;align-items:flex-start;gap:0.2rem;">
+                    <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+                        <span><i class="fa-solid fa-user-gear" style="color:#10b981;margin-right:0.4rem;font-size:0.8rem;"></i>Persona Override</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                    <div style="color:#555;font-size:0.72rem;">Let the AI know who you are</div>
+                    <div style="font-size:0.8rem;margin-top:0.4rem;color:#888;"><i class="fa-solid fa-circle-user" style="color:#555;"></i> <span id="personaName">None set</span></div>
+                </div>
+                <div class="acc-content">
+                    <input type="text" id="personaInput" placeholder="Describe yourself..." style="width:100%;padding:0.5rem;background:#111;border:1px solid #333;color:white;border-radius:6px;margin-top:0.35rem;font-size:0.82rem;outline:none;">
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+</div>
+
+<!-- ======================================================
+     CREATE AGENT MODAL
+====================================================== -->
+<div class="modal-overlay" id="createAppModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-square-plus" style="color:#10b981;"></i> Create Custom AI Agent</h3>
+            <i class="fa-solid fa-xmark close-modal" id="closeCreateModal"></i>
+        </div>
+        <form id="createAppForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Agent Name</label>
+                    <input type="text" id="customAppName" placeholder="e.g. ScholarBot" required>
+                </div>
+                <div class="form-group">
+                    <label>Icon Class (FontAwesome solid icon)</label>
+                    <input type="text" id="customAppAvatar" value="fa-solid fa-robot" placeholder="fa-solid fa-robot">
+                </div>
+                <div class="form-group">
+                    <label>Accent Color</label>
+                    <input type="color" id="customAppColor" value="#8b5cf6" style="height:38px;cursor:pointer;padding:2px;border-radius:6px;border:1px solid #333;background:#111;">
+                </div>
+                <div class="form-group">
+                    <label>System Prompt Instructions</label>
+                    <textarea id="customAppPrompt" placeholder="You are a helpful assistant that..." rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tags (comma separated)</label>
+                    <input type="text" id="customAppTags" placeholder="e.g. Friendly, Coder, Academic">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="cancelCreateModal">Cancel</button>
+                <button type="submit" class="save-btn"><i class="fa-solid fa-plus"></i> Create Agent</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareChatModal">
+    <div class="modal-content" style="max-width:440px;">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-share-nodes" style="color:#3b82f6;"></i> Share Session</h3>
+            <i class="fa-solid fa-xmark close-modal" id="closeShareModal"></i>
+        </div>
+        <div class="modal-body">
+            <p style="color:#666;font-size:0.8rem;margin-bottom:0.75rem;">Share this encrypted session token with others.</p>
+            <div style="display:flex;gap:0.5rem;background:#0a0a12;border:1px solid #333;padding:0.5rem;border-radius:8px;align-items:center;">
+                <input type="text" id="shareLinkInput" readonly style="flex-grow:1;background:transparent;border:none;color:white;font-size:0.82rem;outline:none;">
+                <button class="save-btn" id="copyShareBtn" style="padding:0.35rem 0.75rem;white-space:nowrap;"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+            <div id="copySuccessMsg" style="color:#10b981;font-size:0.78rem;margin-top:0.5rem;display:none;"><i class="fa-solid fa-circle-check"></i> Copied!</div>
+        </div>
+    </div>
+</div>
+
+<!-- DIAGNOSTICS MODAL -->
+<div class="modal-overlay" id="diagnosticsModal">
+    <div class="modal-content" style="max-width:440px;">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-microchip" style="color:#7c3aed;"></i> System Core Diagnostics</h3>
+            <i class="fa-solid fa-xmark close-modal" id="closeDiagnosticsModal"></i>
+        </div>
+        <div class="modal-body" style="font-size:0.85rem;display:flex;flex-direction:column;gap:0.5rem;">
+            <div class="diag-row"><span>System Status</span><span style="color:#10b981;font-weight:600;"><i class="fa-solid fa-circle-check"></i> ONLINE</span></div>
+            <div class="diag-row"><span>Auth Database</span><span>SQLite3 (travel.db)</span></div>
+            <div class="diag-row"><span>LLM Engine</span><span>Gemini 2.5 Flash ReAct</span></div>
+            <div class="diag-row"><span>Latency</span><span id="diagLatencyText">--</span></div>
+            <div class="diag-row"><span>Voice Model</span><span id="diagVoiceText">Onyx WebTTS</span></div>
+            <div class="diag-row"><span>TTS Status</span><span id="diagTTSStatus">Muted</span></div>
+            <div class="diag-row"><span>Protocol</span><span>SSL SHA-256 WebSockets</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================
+     VOICE CALL OVERLAY
+====================================================== -->
+<div class="call-overlay" id="callOverlay">
+    <div class="call-card">
+        <div class="call-avatar-container">
+            <div class="call-avatar" id="callAvatar" style="background:red;"><i class="fa-solid fa-biohazard"></i></div>
+            <div class="call-pulse"></div>
+        </div>
+        <h2 id="callTargetName">NSAI v4</h2>
+        <p id="callStatusText">CONNECTING SECURE VOICE CHANNEL...</p>
+        <div class="call-visualizer" id="callVisualizer">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="call-transcript" id="callTranscript">
+            <div class="call-transcript-inner" id="callTranscriptInner"></div>
+        </div>
+        <div class="call-controls">
+            <button class="call-btn-circle mute-mic" id="callMuteMicBtn" title="Mute Mic"><i class="fa-solid fa-microphone"></i></button>
+            <button class="call-btn-circle hangup" id="callHangupBtn" title="End Call"><i class="fa-solid fa-phone-slash"></i></button>
+            <button class="call-btn-circle speaker" id="callSpeakerBtn" title="Speaker"><i class="fa-solid fa-volume-high"></i></button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
