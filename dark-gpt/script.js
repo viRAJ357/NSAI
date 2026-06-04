@@ -144,8 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const apiBase = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000/api/chat' : '/api/chat';
         try {
-            const res = await fetch('/api/chat', {
+            const res = await fetch(apiBase, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
