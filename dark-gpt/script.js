@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const attachBtn = document.getElementById('attachBtn');
     const fileInput = document.getElementById('fileInput');
     const messagesContainer = document.getElementById('messagesContainer');
+    const landingScreen = document.getElementById('landingScreen');
     
     let chatHistory = [];
     let pendingAttachment = null;
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: file.name,
                 type: file.type
             };
-            chatInput.placeholder = `Attached: ${file.name} - Enter command...`;
+            chatInput.placeholder = `Attached: ${file.name} - Type your message...`;
             chatInput.focus();
         };
         reader.readAsDataURL(file);
@@ -34,17 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-resize textarea
     chatInput.addEventListener('input', function() {
         this.style.height = 'auto';
-        this.style.height = (this.scrollHeight < 200 ? this.scrollHeight : 200) + 'px';
+        this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
         
-        // Change send button color when typing
         if (this.value.trim() !== '') {
-            sendBtn.style.color = 'var(--accent-neon)';
+            sendBtn.style.color = '#3b82f6';
         } else {
-            sendBtn.style.color = 'var(--text-secondary)';
+            sendBtn.style.color = '#111';
         }
     });
 
-    // Handle Enter key (Shift+Enter for new line)
     chatInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -58,27 +57,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = chatInput.value.trim();
         if (text === '' && !pendingAttachment) return;
 
+        // Hide landing screen on first message
+        if (landingScreen) {
+            landingScreen.style.display = 'none';
+        }
+
         const messageData = {
             role: "user", 
             content: text,
             attachment: pendingAttachment
         };
 
-        // 1. Add User Message
         appendUserMessage(text, pendingAttachment);
         chatHistory.push(messageData);
         
         const payloadAttachment = pendingAttachment;
         
-        // Clear input and attachment
         chatInput.value = '';
         chatInput.style.height = 'auto';
-        chatInput.placeholder = "Enter command, click mic, or attach file...";
-        sendBtn.style.color = 'var(--text-secondary)';
+        chatInput.placeholder = "Type your message";
+        sendBtn.style.color = '#111';
         pendingAttachment = null;
         fileInput.value = "";
 
-        // 2. Fetch AI Processing & Response
         fetchAIResponse(text, payloadAttachment);
     }
 
@@ -91,14 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (attachment.type.startsWith('image/')) {
                 attachmentHtml = `<img src="${attachment.dataUrl}" class="attached-image-preview" alt="Attached image">`;
             } else {
-                attachmentHtml = `<div style="font-size: 0.8em; color: var(--accent-neon); margin-bottom: 0.5rem;">📎 ${attachment.name}</div>`;
+                attachmentHtml = `<div style="font-size: 0.8em; color: #3b82f6; margin-bottom: 0.5rem;"><i class="fa-solid fa-paperclip"></i> ${attachment.name}</div>`;
             }
         }
 
         messageDiv.innerHTML = `
-            <div class="message-content">
-                ${escapeHTML(text)}
-                ${attachmentHtml}
+            <div class="message-avatar">N</div>
+            <div class="message-content-wrapper">
+                <div class="message-name">You</div>
+                <div class="message-content">
+                    ${escapeHTML(text)}
+                    ${attachmentHtml}
+                </div>
             </div>
         `;
         messagesContainer.appendChild(messageDiv);
@@ -106,26 +111,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchAIResponse(userText, attachment) {
-        // Create AI message container
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message ai-message';
         
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content typing-cursor';
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'message-avatar';
+        avatarDiv.style.background = 'red';
+        avatarDiv.innerHTML = '<i class="fa-solid fa-biohazard"></i>';
+
+        const wrapperDiv = document.createElement('div');
+        wrapperDiv.className = 'message-content-wrapper';
         
-        messageDiv.appendChild(contentDiv);
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'message-name';
+        nameDiv.innerText = 'NSAI';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.innerHTML = '...';
+
+        wrapperDiv.appendChild(nameDiv);
+        wrapperDiv.appendChild(contentDiv);
+        messageDiv.appendChild(avatarDiv);
+        messageDiv.appendChild(wrapperDiv);
+        
         messagesContainer.appendChild(messageDiv);
         scrollToBottom();
 
         const apiKey = document.getElementById('apiKeyInput')?.value || '';
-        
         if (!apiKey) {
-            typeResponse("> SYSTEM ERROR: API Key missing.\n> Please provide [GEMINI_API_KEY] in the sidebar.", contentDiv, false);
+            contentDiv.innerHTML = "SYSTEM ERROR: API Key missing. Please provide Gemini API Key in the left sidebar input.";
             return;
         }
-
-        contentDiv.innerHTML = "> Establishing secure connection to neural backend...<br>";
-        scrollToBottom();
 
         try {
             const res = await fetch('/api/chat', {
@@ -136,21 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     prompt: userText,
                     attachment: attachment,
-                    history: chatHistory.slice(0, -1), // Send history without the current message
+                    history: chatHistory.slice(0, -1),
                     api_key: apiKey
                 })
             });
 
             const data = await res.json();
             
-            contentDiv.classList.remove('typing-cursor');
-            
             if (!res.ok) {
-                typeResponse(`> FATAL ERROR: ${data.error || 'Unknown server error'}`, contentDiv, false);
+                contentDiv.innerHTML = `FATAL ERROR: ${data.error || 'Unknown server error'}`;
             } else {
-                // Render with marked.js instead of typing out slowly to support complex markdown/tables
-                contentDiv.innerHTML = marked.parse(data.response || "> No data received.");
-                // Apply syntax highlighting
+                contentDiv.innerHTML = marked.parse(data.response || "No data received.");
                 contentDiv.querySelectorAll('pre code').forEach((block) => {
                     hljs.highlightElement(block);
                 });
@@ -158,43 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollToBottom();
             }
         } catch (error) {
-            contentDiv.classList.remove('typing-cursor');
-            typeResponse(`> CONNECTION FAILED: ${error.message}\n> Is the NSAI backend server running?`, contentDiv, false);
+            contentDiv.innerHTML = `CONNECTION FAILED: ${error.message}`;
         }
-    }
-
-    function typeResponse(response, contentDiv, useMarkdown = false) {
-        if (useMarkdown) {
-            contentDiv.innerHTML = marked.parse(response);
-            contentDiv.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightElement(block);
-            });
-            scrollToBottom();
-            return;
-        }
-
-        // Typing effect for raw text
-        let i = 0;
-        const typingSpeed = 15; // ms per character
-        contentDiv.classList.add('typing-cursor');
-        contentDiv.innerHTML = '';
-
-        function typeWriter() {
-            if (i < response.length) {
-                if (response.charAt(i) === '\n') {
-                    contentDiv.innerHTML += '<br>';
-                } else {
-                    contentDiv.innerHTML += response.charAt(i);
-                }
-                i++;
-                scrollToBottom();
-                setTimeout(typeWriter, typingSpeed);
-            } else {
-                contentDiv.classList.remove('typing-cursor');
-            }
-        }
-
-        setTimeout(typeWriter, 100);
     }
 
     // --- Voice Input Logic ---
@@ -210,19 +188,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         recognition.onstart = function() {
             isRecording = true;
-            micBtn.classList.add('recording');
+            micBtn.style.color = '#e63946';
             chatInput.placeholder = "Listening...";
         };
 
         recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
             chatInput.value = transcript;
-            chatInput.dispatchEvent(new Event('input')); // trigger resize
-            sendMessage(); // Automatically send after speaking
+            chatInput.dispatchEvent(new Event('input')); 
+            sendMessage(); 
         };
 
         recognition.onerror = function(event) {
-            console.error("Speech recognition error", event.error);
             resetMic();
         };
 
@@ -230,12 +207,11 @@ document.addEventListener('DOMContentLoaded', () => {
             resetMic();
         };
     } else {
-        micBtn.style.display = 'none'; // Hide mic if not supported
+        micBtn.style.display = 'none';
     }
 
     micBtn.addEventListener('click', () => {
         if (!recognition) return;
-        
         if (isRecording) {
             recognition.stop();
         } else {
@@ -245,15 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetMic() {
         isRecording = false;
-        micBtn.classList.remove('recording');
-        chatInput.placeholder = "Enter command or click mic...";
+        micBtn.style.color = '';
+        chatInput.placeholder = "Type your message";
     }
 
     function scrollToBottom() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // Utility to prevent XSS
     function escapeHTML(str) {
         return str.replace(/[&<>'"]/g, 
             tag => ({
@@ -264,38 +239,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 '"': '&quot;'
             }[tag] || tag)
         );
-    }
-    // --- Matrix Rain Effect ---
-    const canvas = document.getElementById('matrixBg');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=~[]{}|;:,.<>?/'.split('');
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
-        const drops = [];
-        for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ff41'; // Hacker green
-            ctx.font = fontSize + 'px monospace';
-            for (let i = 0; i < drops.length; i++) {
-                const text = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-        }
-        setInterval(drawMatrix, 33);
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
     }
 });
