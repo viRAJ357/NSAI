@@ -55,7 +55,7 @@
             <button class="view-all-btn">
                 <i class="fa-solid fa-compass"></i> View all AI apps
             </button>
-            <button class="create-btn">
+            <button class="create-btn" id="createNewBtn">
                 <i class="fa-solid fa-plus"></i> Create
             </button>
             
@@ -76,15 +76,19 @@
         <!-- MAIN CHAT AREA -->
         <main class="chat-main">
             <header class="main-header">
+                <div class="header-left-mobile">
+                    <i class="fa-solid fa-bars mobile-menu-btn" id="leftMenuBtn"></i>
+                </div>
                 <div class="header-title">
                     <span>AI model</span>
                     <strong>RolePlay v4</strong> <i class="fa-solid fa-chevron-down" style="font-size:0.8rem;"></i>
                 </div>
                 <div class="header-actions">
-                    <i class="fa-regular fa-heart"></i>
-                    <i class="fa-solid fa-share-nodes"></i>
-                    <i class="fa-solid fa-volume-xmark"></i>
-                    <i class="fa-solid fa-ellipsis"></i>
+                    <i class="fa-regular fa-heart interactive-icon" title="Like"></i>
+                    <i class="fa-solid fa-share-nodes interactive-icon" title="Share"></i>
+                    <i class="fa-solid fa-volume-xmark interactive-icon mute-toggle" title="Mute/Unmute"></i>
+                    <i class="fa-solid fa-ellipsis interactive-icon" title="Options"></i>
+                    <i class="fa-solid fa-circle-info mobile-menu-btn" id="rightMenuBtn" style="margin-left: 0.5rem;"></i>
                 </div>
             </header>
 
@@ -185,35 +189,62 @@
             </div>
 
             <div class="right-tabs">
-                <div class="tab">COMMUNITY</div>
+                <div class="tab active-tab" data-tab="community">COMMUNITY</div>
                 <div class="tab">View all ></div>
             </div>
-            <div class="empty-state">No posts yet</div>
+            <div class="empty-state" id="communityState">No posts yet</div>
 
             <div class="right-tabs" style="margin-top: 1rem; border-top: 1px solid #333; padding-top: 1rem;">
-                <div class="tab" style="color: #fff;">Chats</div>
-                <div class="tab"><i class="fa-solid fa-plus"></i> New chat</div>
+                <div class="tab active-tab" data-tab="chats" style="color: #fff;">Chats</div>
+                <div class="tab" id="newChatBtn" style="cursor: pointer;"><i class="fa-solid fa-plus"></i> New chat</div>
             </div>
+            <div class="empty-state" id="chatsState" style="display: none; padding-top: 0.5rem;">No chats yet</div>
 
             <!-- Accordions at bottom -->
             <div class="settings-accordions">
                 <div class="accordion">
-                    <span>Voice</span> <span style="color:#aaa; font-size:0.8rem;"><i class="fa-solid fa-user-tie"></i> Onyx</span>
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <div class="acc-header">
+                        <span>Voice</span> 
+                        <div>
+                            <span style="color:#aaa; font-size:0.8rem;"><i class="fa-solid fa-user-tie"></i> Onyx</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="acc-content">
+                        <div class="acc-item">Alloy</div>
+                        <div class="acc-item">Echo</div>
+                        <div class="acc-item active">Onyx</div>
+                    </div>
                 </div>
                 <div class="accordion">
-                    <span>Memory</span> <i class="fa-solid fa-brain" style="color:#aaa; font-size:0.8rem;"></i>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-                <div class="accordion" style="flex-direction: column; align-items: flex-start; gap: 0.2rem;">
-                    <div style="display:flex; justify-content:space-between; width:100%;">
-                        <span>Persona</span> <i class="fa-solid fa-chevron-down"></i>
+                    <div class="acc-header">
+                        <span>Memory</span> 
+                        <div>
+                            <i class="fa-solid fa-brain" style="color:#aaa; font-size:0.8rem;"></i>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
                     </div>
-                    <div style="color:#888; font-size:0.75rem;">Let the AI know who you are</div>
-                    <div style="font-size:0.85rem; margin-top:0.5rem;"><i class="fa-solid fa-circle-user" style="color:#aaa;"></i> None selected</div>
+                    <div class="acc-content">
+                        <p style="font-size: 0.8rem; color: #888; padding: 0.5rem 0;">Memory is active. The AI will remember details across sessions.</p>
+                    </div>
+                </div>
+                <div class="accordion">
+                    <div class="acc-header" style="flex-direction: column; align-items: flex-start; gap: 0.2rem;">
+                        <div style="display:flex; justify-content:space-between; width:100%;">
+                            <span>Persona</span> <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div style="color:#888; font-size:0.75rem;">Let the AI know who you are</div>
+                        <div style="font-size:0.85rem; margin-top:0.5rem;"><i class="fa-solid fa-circle-user" style="color:#aaa;"></i> <span id="personaName">None selected</span></div>
+                    </div>
+                    <div class="acc-content">
+                        <input type="text" id="personaInput" placeholder="Describe yourself..." style="width: 100%; padding: 0.5rem; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 0.5rem;" />
+                    </div>
                 </div>
             </div>
         </aside>
+
+        <!-- Overlay for mobile sidebars -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     </div>
     <script src="script.js"></script>

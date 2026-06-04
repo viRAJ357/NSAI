@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
     const micBtn = document.getElementById('micBtn');
@@ -7,13 +8,131 @@ document.addEventListener('DOMContentLoaded', () => {
     const messagesContainer = document.getElementById('messagesContainer');
     const landingScreen = document.getElementById('landingScreen');
     
+    // Sidebar Toggles
+    const leftMenuBtn = document.getElementById('leftMenuBtn');
+    const rightMenuBtn = document.getElementById('rightMenuBtn');
+    const sidebarLeft = document.querySelector('.sidebar-left');
+    const sidebarRight = document.querySelector('.sidebar-right');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    // UI Buttons
+    const newChatBtns = [document.getElementById('newChatBtn'), document.getElementById('createNewBtn')];
+    const tabs = document.querySelectorAll('.tab[data-tab]');
+    const interactiveIcons = document.querySelectorAll('.interactive-icon');
+    const accordions = document.querySelectorAll('.accordion');
+
     let chatHistory = [];
     let pendingAttachment = null;
 
-    // Handle File Attachment
-    attachBtn.addEventListener('click', () => {
-        fileInput.click();
+    // --- Sidebar Toggle Logic (Mobile/Tablet) ---
+    function openSidebar(sidebar) {
+        sidebar.classList.add('open');
+        sidebarOverlay.style.display = 'block';
+    }
+    
+    function closeSidebars() {
+        sidebarLeft.classList.remove('open');
+        sidebarRight.classList.remove('open');
+        sidebarOverlay.style.display = 'none';
+    }
+
+    if(leftMenuBtn) leftMenuBtn.addEventListener('click', () => openSidebar(sidebarLeft));
+    if(rightMenuBtn) rightMenuBtn.addEventListener('click', () => openSidebar(sidebarRight));
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebars);
+
+    // --- New Chat Logic ---
+    newChatBtns.forEach(btn => {
+        if(btn) {
+            btn.addEventListener('click', () => {
+                messagesContainer.innerHTML = '';
+                messagesContainer.appendChild(landingScreen);
+                landingScreen.style.display = 'flex';
+                chatHistory = [];
+                closeSidebars();
+            });
+        }
     });
+
+    // --- Tabs Logic (Community vs Chats) ---
+    tabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const target = e.currentTarget.dataset.tab;
+            
+            // Remove active from siblings
+            const parent = e.currentTarget.parentElement;
+            parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active-tab'));
+            e.currentTarget.classList.add('active-tab');
+
+            // Toggle states
+            if (target === 'community') {
+                document.getElementById('communityState').style.display = 'block';
+                document.getElementById('chatsState').style.display = 'none';
+            } else if (target === 'chats') {
+                document.getElementById('communityState').style.display = 'none';
+                document.getElementById('chatsState').style.display = 'block';
+            }
+        });
+    });
+
+    // --- Accordion Logic ---
+    accordions.forEach(acc => {
+        const header = acc.querySelector('.acc-header');
+        const content = acc.querySelector('.acc-content');
+        if (header && content) {
+            header.addEventListener('click', () => {
+                // Toggle this accordion
+                content.classList.toggle('show');
+                const icon = header.querySelector('.fa-chevron-down, .fa-chevron-right');
+                if (icon) {
+                    if (content.classList.contains('show')) {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-down');
+                    } else {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-right');
+                    }
+                }
+            });
+        }
+    });
+
+    // Accordion internal item selection (e.g. Voice)
+    document.querySelectorAll('.acc-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const siblings = e.currentTarget.parentElement.querySelectorAll('.acc-item');
+            siblings.forEach(s => s.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+        });
+    });
+
+    // Persona input sync
+    const personaInput = document.getElementById('personaInput');
+    const personaName = document.getElementById('personaName');
+    if (personaInput && personaName) {
+        personaInput.addEventListener('input', (e) => {
+            personaName.innerText = e.target.value || "None selected";
+        });
+    }
+
+    // --- Interactive Icons (Like, Share, Mute) ---
+    interactiveIcons.forEach(icon => {
+        icon.addEventListener('click', (e) => {
+            if (e.currentTarget.classList.contains('mute-toggle')) {
+                if (e.currentTarget.classList.contains('fa-volume-xmark')) {
+                    e.currentTarget.classList.remove('fa-volume-xmark');
+                    e.currentTarget.classList.add('fa-volume-high');
+                } else {
+                    e.currentTarget.classList.remove('fa-volume-high');
+                    e.currentTarget.classList.add('fa-volume-xmark');
+                }
+            } else {
+                e.currentTarget.classList.toggle('active');
+            }
+        });
+    });
+
+    // --- Core Chat Logic ---
+    attachBtn.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -32,16 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     });
     
-    // Auto-resize textarea
     chatInput.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
-        
-        if (this.value.trim() !== '') {
-            sendBtn.style.color = '#3b82f6';
-        } else {
-            sendBtn.style.color = '#111';
-        }
+        sendBtn.style.color = this.value.trim() !== '' ? '#3b82f6' : '#111';
     });
 
     chatInput.addEventListener('keydown', function(e) {
@@ -57,16 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = chatInput.value.trim();
         if (text === '' && !pendingAttachment) return;
 
-        // Hide landing screen on first message
-        if (landingScreen) {
-            landingScreen.style.display = 'none';
-        }
+        if (landingScreen) landingScreen.style.display = 'none';
 
-        const messageData = {
-            role: "user", 
-            content: text,
-            attachment: pendingAttachment
-        };
+        const messageData = { role: "user", content: text, attachment: pendingAttachment };
 
         appendUserMessage(text, pendingAttachment);
         chatHistory.push(messageData);
@@ -97,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         messageDiv.innerHTML = `
-            <div class="message-avatar">N</div>
+            <div class="message-avatar">U</div>
             <div class="message-content-wrapper">
                 <div class="message-name">You</div>
                 <div class="message-content">
@@ -114,31 +220,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message ai-message';
         
-        const avatarDiv = document.createElement('div');
-        avatarDiv.className = 'message-avatar';
-        avatarDiv.style.background = 'red';
-        avatarDiv.innerHTML = '<i class="fa-solid fa-biohazard"></i>';
-
-        const wrapperDiv = document.createElement('div');
-        wrapperDiv.className = 'message-content-wrapper';
-        
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'message-name';
-        nameDiv.innerText = 'NSAI';
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-        contentDiv.innerHTML = '...';
-
-        wrapperDiv.appendChild(nameDiv);
-        wrapperDiv.appendChild(contentDiv);
-        messageDiv.appendChild(avatarDiv);
-        messageDiv.appendChild(wrapperDiv);
-        
+        messageDiv.innerHTML = `
+            <div class="message-avatar" style="background: red;"><i class="fa-solid fa-biohazard"></i></div>
+            <div class="message-content-wrapper">
+                <div class="message-name">NSAI</div>
+                <div class="message-content typing-indicator">...</div>
+            </div>
+        `;
         messagesContainer.appendChild(messageDiv);
         scrollToBottom();
 
+        const contentDiv = messageDiv.querySelector('.message-content');
         const apiKey = document.getElementById('apiKeyInput')?.value || '';
+        
         if (!apiKey) {
             contentDiv.innerHTML = "SYSTEM ERROR: API Key missing. Please provide Gemini API Key in the left sidebar input.";
             return;
@@ -148,9 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch(apiBase, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     prompt: userText,
                     attachment: attachment,
@@ -165,9 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 contentDiv.innerHTML = `FATAL ERROR: ${data.error || 'Unknown server error'}`;
             } else {
                 contentDiv.innerHTML = marked.parse(data.response || "No data received.");
-                contentDiv.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
+                contentDiv.querySelectorAll('pre code').forEach((block) => { hljs.highlightElement(block); });
                 chatHistory.push({role: "assistant", content: data.response});
                 scrollToBottom();
             }
@@ -176,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Voice Input Logic ---
+    // --- Voice Input ---
     let isRecording = false;
     let recognition;
     
@@ -194,31 +284,23 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            chatInput.value = transcript;
+            chatInput.value = event.results[0][0].transcript;
             chatInput.dispatchEvent(new Event('input')); 
             sendMessage(); 
         };
 
-        recognition.onerror = function(event) {
-            resetMic();
-        };
-
-        recognition.onend = function() {
-            resetMic();
-        };
+        recognition.onerror = resetMic;
+        recognition.onend = resetMic;
     } else {
-        micBtn.style.display = 'none';
+        if(micBtn) micBtn.style.display = 'none';
     }
 
-    micBtn.addEventListener('click', () => {
-        if (!recognition) return;
-        if (isRecording) {
-            recognition.stop();
-        } else {
-            recognition.start();
-        }
-    });
+    if(micBtn) {
+        micBtn.addEventListener('click', () => {
+            if (!recognition) return;
+            isRecording ? recognition.stop() : recognition.start();
+        });
+    }
 
     function resetMic() {
         isRecording = false;
@@ -226,19 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.placeholder = "Type your message";
     }
 
-    function scrollToBottom() {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
+    function scrollToBottom() { messagesContainer.scrollTop = messagesContainer.scrollHeight; }
 
     function escapeHTML(str) {
         return str.replace(/[&<>'"]/g, 
-            tag => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                "'": '&#39;',
-                '"': '&quot;'
-            }[tag] || tag)
+            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
         );
     }
 });
