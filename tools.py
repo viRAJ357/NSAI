@@ -2,6 +2,8 @@ import sqlite3
 import requests
 from langchain.tools import tool
 import streamlit as st
+from langchain_community.tools import DuckDuckGoSearchResults
+from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 
 DB_PATH = "travel.db"
 
@@ -112,5 +114,105 @@ def estimate_budget(flight_cost: float, hotel_cost_per_night: float, nights: int
     )
     return breakdown
 
+@tool
+def search_web(query: str) -> str:
+    """
+    Search the live web for general information, current events, or questions outside of travel planning.
+    Args:
+        query: The search query to run on DuckDuckGo.
+    Returns:
+        String containing snippets of search results.
+    """
+    try:
+        wrapper = DuckDuckGoSearchAPIWrapper(max_results=3)
+        search = DuckDuckGoSearchResults(api_wrapper=wrapper)
+        return search.run(query)
+    except Exception as e:
+        return f"Error executing web search: {str(e)}"
+
+@tool
+def read_document(file_path: str) -> str:
+    """
+    Read and extract text content from a PDF, CSV, or plain text file.
+    Args:
+        file_path: The absolute path to the file on the local system.
+    Returns:
+        Extracted text content from the file.
+    """
+    import os
+    if not os.path.exists(file_path):
+        return f"Error: File not found at '{file_path}'"
+    
+    ext = os.path.splitext(file_path)[1].lower()
+    try:
+        if ext == '.pdf':
+            from PyPDF2 import PdfReader
+            reader = PdfReader(file_path)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text() or ""
+            return text[:5000] if text else "Could not extract text from PDF."
+        elif ext == '.csv':
+            import pandas as pd
+            df = pd.read_csv(file_path)
+            return f"CSV loaded with {len(df)} rows and {len(df.columns)} columns.\nColumns: {list(df.columns)}\n\nFirst 10 rows:\n{df.head(10).to_markdown(index=False)}"
+        elif ext == '.xlsx':
+            import pandas as pd
+            df = pd.read_excel(file_path)
+            return f"Excel loaded with {len(df)} rows and {len(df.columns)} columns.\nColumns: {list(df.columns)}\n\nFirst 10 rows:\n{df.head(10).to_markdown(index=False)}"
+        elif ext in ['.txt', '.md', '.py', '.js', '.html', '.css', '.json']:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            return content[:5000]
+        else:
+            return f"Unsupported file type: {ext}"
+    except Exception as e:
+        return f"Error reading file: {str(e)}"
+
+@tool
+def run_python_code(code: str) -> str:
+    """
+    Execute Python code for data analysis, complex math calculations, generating statistics, or solving problems.
+    The code runs in a sandboxed environment. Use 'print()' to output results.
+    Common libraries available: math, statistics, datetime, json, os.
+    Args:
+        code: Python code string to execute.
+    Returns:
+        The printed output from executing the code.
+    """
+    import io
+    import sys
+    import math
+    import statistics
+    import datetime
+    import json as json_lib
+    
+    old_stdout = sys.stdout
+    sys.stdout = buffer = io.StringIO()
+    
+    allowed_globals = {
+        "__builtins__": __builtins__,
+        "math": math,
+        "statistics": statistics,
+        "datetime": datetime,
+        "json": json_lib,
+    }
+    
+    try:
+        # Try importing optional heavy libs
+        try:
+            import pandas as pd
+            allowed_globals["pd"] = pd
+        except ImportError:
+            pass
+            
+        exec(code, allowed_globals)
+        output = buffer.getvalue()
+        return output if output else "Code executed successfully (no print output)."
+    except Exception as e:
+        return f"Error executing code: {str(e)}"
+    finally:
+        sys.stdout = old_stdout
+
 # List of tools to be used by the agent
-travel_tools = [search_flights, recommend_hotels, discover_places, lookup_weather, estimate_budget]
+travel_tools = [search_flights, recommend_hotels, discover_places, lookup_weather, estimate_budget, search_web, read_document, run_python_code]
